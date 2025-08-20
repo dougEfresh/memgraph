@@ -3,6 +3,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: memgraph-data-{{ $data.id }}
+  labels:
+    {{- with $.Values.labels.data.statefulSetLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   serviceName: "memgraph-data-{{ $data.id }}"
   replicas: 1
@@ -10,11 +14,18 @@ spec:
     matchLabels:
       app: memgraph-data-{{ $data.id }}
       role: data
+  {{- with $.Values.updateStrategy }}
+  updateStrategy:
+  {{ toYaml . | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       labels:
         app: memgraph-data-{{ $data.id }}
         role: data
+        {{- with $.Values.labels.data.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       securityContext:
         runAsUser: {{ $.Values.memgraphUserId }}

@@ -89,10 +89,8 @@ sysctlInitContainer:
     tag: latest
     pullPolicy: IfNotPresent
 
-# The explicit user and group setup is required because at the init container
-# time, there is not yet a user created. This seems fine because under both
-# Memgraph and Mage images we actually hard-code the user and group id. The
-# config is used to chown user storage and core dumps claims' month paths.
+# This is fine because under both
+# Memgraph and Mage images we actually hard-code the user and group id.
 memgraphUserId: 101
 memgraphGroupId: 103
 
@@ -101,6 +99,16 @@ secrets:
   name: memgraph-secrets
   userKey: USER
   passwordKey: PASSWORD
+
+labels:
+  coordinators:
+    podLabels: {}
+    statefulSetLabels: {}
+    serviceLabels: {}
+  data:
+    podLabels: {}
+    statefulSetLabels: {}
+    serviceLabels: {}
 
 container:
   data:
@@ -146,6 +154,10 @@ container:
 resources:
   data: {}
   coordinators: {}
+
+
+updateStrategy:
+  type: RollingUpdate  # Set to OnDelete to support ISSU
 
 prometheus:
   enabled: false
